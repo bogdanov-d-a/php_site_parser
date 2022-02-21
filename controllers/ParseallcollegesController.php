@@ -88,12 +88,41 @@ class ParseallcollegesController extends Controller
         }
     }
 
+    private static function fillHeaderNodeIndices(&$orderByUrl)
+    {
+        foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
+        {
+            $orderByUrlValueNodes = $orderByUrlValue['nodes'];
+            $orderByUrlValueNodesCount = count($orderByUrlValueNodes);
+            $found = false;
+
+            for ($orderByUrlValueNodeIndex = 0; $orderByUrlValueNodeIndex < $orderByUrlValueNodesCount; $orderByUrlValueNodeIndex++)
+            {
+                $orderByUrlValueNode = $orderByUrlValueNodes[$orderByUrlValueNodeIndex];
+                $orderByUrlValueNodePath = $orderByUrlValueNode['nodePath'];
+
+                if (array_search('h2', $orderByUrlValueNodePath) !== false)
+                {
+                    $orderByUrlValue['headerNodeIndex'] = $orderByUrlValueNodeIndex;
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found)
+            {
+                throw new Exception('fillHeaderNodeIndices !$found');
+            }
+        }
+    }
+
     private static function generateEchoOrderByUrlText($orderByUrl, &$result)
     {
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
         {
             $result .= $orderByUrlKey . '<br/>';
             $result .= Utils::BoolToStr($orderByUrlValue['isFeatured']) . '<br/>';
+            $result .= $orderByUrlValue['headerNodeIndex'] . '<br/>';
             foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
             {
                 $result .= implode('/', $orderByUrlValueNode['nodePath']) . '<br/>';
@@ -146,6 +175,8 @@ class ParseallcollegesController extends Controller
         $featuredNodePathsEqualItemCount = Utils::EqualItemCountMulti($allFeaturedNodePaths);
         $featuredNodePathsCommonRoot = Utils::TrimArray($allFeaturedNodePaths[0], $featuredNodePathsEqualItemCount);
         ParseallcollegesController::stripNodePaths($orderByUrl, true, $featuredNodePathsEqualItemCount);
+
+        ParseallcollegesController::fillHeaderNodeIndices($orderByUrl);
 
         return $this->render('index', [
             'echoText' => ParseallcollegesController::generateEchoText($nodePathsCommonRoot, $featuredNodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks),
