@@ -111,7 +111,7 @@ class ParseallcollegesController extends Controller
 
             if (!$found)
             {
-                throw new Exception('fillHeaderNodeIndices !$found');
+                throw new \Exception('fillHeaderNodeIndices !$found');
             }
         }
     }
@@ -121,7 +121,7 @@ class ParseallcollegesController extends Controller
         $entries = $xpath->query('/' . implode('/', $nodePath));
         if (count($entries) != 1)
         {
-            throw new Exception('findOneNodeByPath count($entries) != 1');
+            throw new \Exception('findOneNodeByPath count($entries) != 1');
         }
         return $entries[0];
     }
@@ -136,13 +136,24 @@ class ParseallcollegesController extends Controller
                 $nodePathRoot = array_merge($nodePathRoot, $featuredNodePathsCommonRoot);
             }
 
-            $headerNodePath = array_merge($nodePathRoot, $orderByUrlValue['nodes'][$orderByUrlValue['headerNodeIndex']]['nodePath']);
+            $headerNodePathRelative = $orderByUrlValue['nodes'][$orderByUrlValue['headerNodeIndex']]['nodePath'];
+            $headerNodePath = array_merge($nodePathRoot, $headerNodePathRelative);
             $headerNode = ParseallcollegesController::findOneNodeByPath($xpath, $headerNodePath);
             $orderByUrlValue['universityName'] = $headerNode->nodeValue;
 
             $locationNodePath = array_merge(array_slice($headerNodePath, 0, array_search('h2', $headerNodePath)), ['div[1]']);
             $locationNode = ParseallcollegesController::findOneNodeByPath($xpath, $locationNodePath);
             $orderByUrlValue['universityLocation'] = $locationNode->nodeValue;
+
+            $universityNodePathRoot = array_merge($nodePathRoot, [$headerNodePathRelative[0]]);
+            $universityNodeRoot = ParseallcollegesController::findOneNodeByPath($xpath, $universityNodePathRoot);
+
+            $imgElements = $universityNodeRoot->getElementsByTagName('img');
+            if (count($imgElements) > 1)
+            {
+                throw new \Exception('fillUniversityInfo count($imgElements) > 1');
+            }
+            $orderByUrlValue['universityImgUrl'] = (count($imgElements) == 1) ? $imgElements[0]->getAttribute('src') : '';
         }
     }
 
@@ -155,6 +166,7 @@ class ParseallcollegesController extends Controller
             $result .= $orderByUrlValue['headerNodeIndex'] . '<br/>';
             $result .= $orderByUrlValue['universityName'] . '<br/>';
             $result .= $orderByUrlValue['universityLocation'] . '<br/>';
+            $result .= $orderByUrlValue['universityImgUrl'] . '<br/>';
             foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
             {
                 $result .= implode('/', $orderByUrlValueNode['nodePath']) . '<br/>';
