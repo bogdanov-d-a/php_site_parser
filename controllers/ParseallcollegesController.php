@@ -28,26 +28,32 @@ class ParseallcollegesController extends Controller
         return $result;
     }
 
-    private static function fillAllNodePaths($orderByUrl)
+    private static function fillAllNodePaths($orderByUrl, $featuredOnly)
     {
         $result = [];
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
         {
-            foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
+            if (!$featuredOnly || $orderByUrlValue['isFeatured'])
             {
-                $result[] = $orderByUrlValueNode['nodePath'];
+                foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
+                {
+                    $result[] = $orderByUrlValueNode['nodePath'];
+                }
             }
         }
         return $result;
     }
 
-    private static function stripNodePaths(&$orderByUrl, $nodePathsEqualItemCount)
+    private static function stripNodePaths(&$orderByUrl, $featuredOnly, $nodePathsEqualItemCount)
     {
         foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
         {
-            foreach ($orderByUrlValue['nodes'] as &$orderByUrlValueNode)
+            if (!$featuredOnly || $orderByUrlValue['isFeatured'])
             {
-                $orderByUrlValueNode['nodePath'] = Utils::StripArrayBeginning($orderByUrlValueNode['nodePath'], $nodePathsEqualItemCount);
+                foreach ($orderByUrlValue['nodes'] as &$orderByUrlValueNode)
+                {
+                    $orderByUrlValueNode['nodePath'] = Utils::StripArrayBeginning($orderByUrlValueNode['nodePath'], $nodePathsEqualItemCount);
+                }
             }
         }
     }
@@ -109,10 +115,11 @@ class ParseallcollegesController extends Controller
         }
     }
 
-    private static function generateEchoText($nodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks)
+    private static function generateEchoText($nodePathsCommonRoot, $featuredNodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks)
     {
         $result = '';
         $result .= implode('/', $nodePathsCommonRoot) . '<br/>';
+        $result .= implode('/', $featuredNodePathsCommonRoot) . '<br/>';
         $result .= '<br/>';
 
         ParseallcollegesController::generateEchoOrderByUrlText($orderByUrl, $result);
@@ -126,17 +133,22 @@ class ParseallcollegesController extends Controller
         $doc = Utils::ParseHtml(Utils::GetHtml('https://www.princetonreview.com/college-search?ceid=cp-1022984'));
 
         $orderByUrl = ParseallcollegesController::fillOrderByUrl($doc);
-        $allNodePaths = ParseallcollegesController::fillAllNodePaths($orderByUrl);
+        $allNodePaths = ParseallcollegesController::fillAllNodePaths($orderByUrl, false);
 
         $nodePathsEqualItemCount = Utils::EqualItemCountMulti($allNodePaths);
         $nodePathsCommonRoot = Utils::TrimArray($allNodePaths[0], $nodePathsEqualItemCount);
-        ParseallcollegesController::stripNodePaths($orderByUrl, $nodePathsEqualItemCount);
+        ParseallcollegesController::stripNodePaths($orderByUrl, false, $nodePathsEqualItemCount);
 
         $rootNodeNameToLinks = ParseallcollegesController::fillRootNodeNameToLinks($orderByUrl);
         ParseallcollegesController::fillFeaturedFromTop($orderByUrl, $rootNodeNameToLinks);
 
+        $allFeaturedNodePaths = ParseallcollegesController::fillAllNodePaths($orderByUrl, true);
+        $featuredNodePathsEqualItemCount = Utils::EqualItemCountMulti($allFeaturedNodePaths);
+        $featuredNodePathsCommonRoot = Utils::TrimArray($allFeaturedNodePaths[0], $featuredNodePathsEqualItemCount);
+        ParseallcollegesController::stripNodePaths($orderByUrl, true, $featuredNodePathsEqualItemCount);
+
         return $this->render('index', [
-            'echoText' => ParseallcollegesController::generateEchoText($nodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks),
+            'echoText' => ParseallcollegesController::generateEchoText($nodePathsCommonRoot, $featuredNodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks),
         ]);
     }
 }
