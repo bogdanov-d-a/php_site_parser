@@ -17,9 +17,9 @@ class ParseallcollegesController extends Controller
             {
                 if (!array_key_exists($url, $result))
                 {
-                    $result[$url] = [];
+                    $result[$url] = ['nodes' => []];
                 }
-                $result[$url][] = [
+                $result[$url]['nodes'][] = [
                     'node' => $link,
                     'nodePath' => explode('/', $link->getNodePath()),
                 ];
@@ -33,9 +33,9 @@ class ParseallcollegesController extends Controller
         $result = [];
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
         {
-            foreach ($orderByUrlValue as $orderByUrlValueItem)
+            foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
             {
-                $result[] = $orderByUrlValueItem['nodePath'];
+                $result[] = $orderByUrlValueNode['nodePath'];
             }
         }
         return $result;
@@ -45,9 +45,9 @@ class ParseallcollegesController extends Controller
     {
         foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
         {
-            foreach ($orderByUrlValue as &$orderByUrlValueItem)
+            foreach ($orderByUrlValue['nodes'] as &$orderByUrlValueNode)
             {
-                $orderByUrlValueItem['nodePath'] = Utils::StripArrayBeginning($orderByUrlValueItem['nodePath'], $nodePathsEqualItemCount);
+                $orderByUrlValueNode['nodePath'] = Utils::StripArrayBeginning($orderByUrlValueNode['nodePath'], $nodePathsEqualItemCount);
             }
         }
     }
@@ -57,9 +57,9 @@ class ParseallcollegesController extends Controller
         $result = [];
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
         {
-            foreach ($orderByUrlValue as $orderByUrlValueItem)
+            foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
             {
-                $rootNodeName = $orderByUrlValueItem['nodePath'][0];
+                $rootNodeName = $orderByUrlValueNode['nodePath'][0];
                 if (!array_key_exists($rootNodeName, $result))
                 {
                     $result[$rootNodeName] = [];
@@ -75,9 +75,9 @@ class ParseallcollegesController extends Controller
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
         {
             $result .= $orderByUrlKey . '<br/>';
-            foreach ($orderByUrlValue as $orderByUrlValueItem)
+            foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
             {
-                $result .= implode('/', $orderByUrlValueItem['nodePath']) . '<br/>';
+                $result .= implode('/', $orderByUrlValueNode['nodePath']) . '<br/>';
             }
             $result .= '<br/>';
         }
