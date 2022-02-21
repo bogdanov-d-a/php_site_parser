@@ -136,9 +136,13 @@ class ParseallcollegesController extends Controller
                 $nodePathRoot = array_merge($nodePathRoot, $featuredNodePathsCommonRoot);
             }
 
-            $headerNode = ParseallcollegesController::findOneNodeByPath($xpath, array_merge($nodePathRoot, $orderByUrlValue['nodes'][$orderByUrlValue['headerNodeIndex']]['nodePath']));
-
+            $headerNodePath = array_merge($nodePathRoot, $orderByUrlValue['nodes'][$orderByUrlValue['headerNodeIndex']]['nodePath']);
+            $headerNode = ParseallcollegesController::findOneNodeByPath($xpath, $headerNodePath);
             $orderByUrlValue['universityName'] = $headerNode->nodeValue;
+
+            $locationNodePath = array_merge(array_slice($headerNodePath, 0, array_search('h2', $headerNodePath)), ['div[1]']);
+            $locationNode = ParseallcollegesController::findOneNodeByPath($xpath, $locationNodePath);
+            $orderByUrlValue['universityLocation'] = $locationNode->nodeValue;
         }
     }
 
@@ -150,6 +154,7 @@ class ParseallcollegesController extends Controller
             $result .= Utils::BoolToStr($orderByUrlValue['isFeatured']) . '<br/>';
             $result .= $orderByUrlValue['headerNodeIndex'] . '<br/>';
             $result .= $orderByUrlValue['universityName'] . '<br/>';
+            $result .= $orderByUrlValue['universityLocation'] . '<br/>';
             foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
             {
                 $result .= implode('/', $orderByUrlValueNode['nodePath']) . '<br/>';
