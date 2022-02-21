@@ -70,11 +70,24 @@ class ParseallcollegesController extends Controller
         return $result;
     }
 
+    private static function fillFeaturedFromTop(&$orderByUrl, $rootNodeNameToLinks)
+    {
+        foreach ($rootNodeNameToLinks as $rootNodeName => $links)
+        {
+            $isFeatured = count($links) > 1;
+            foreach ($links as $linksKey => $linksValue)
+            {
+                $orderByUrl[$linksKey]['isFeatured'] = $isFeatured;
+            }
+        }
+    }
+
     private static function generateEchoOrderByUrlText($orderByUrl, &$result)
     {
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
         {
             $result .= $orderByUrlKey . '<br/>';
+            $result .= Utils::BoolToStr($orderByUrlValue['isFeatured']) . '<br/>';
             foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
             {
                 $result .= implode('/', $orderByUrlValueNode['nodePath']) . '<br/>';
@@ -117,10 +130,10 @@ class ParseallcollegesController extends Controller
 
         $nodePathsEqualItemCount = Utils::EqualItemCountMulti($allNodePaths);
         $nodePathsCommonRoot = Utils::TrimArray($allNodePaths[0], $nodePathsEqualItemCount);
-
         ParseallcollegesController::stripNodePaths($orderByUrl, $nodePathsEqualItemCount);
 
         $rootNodeNameToLinks = ParseallcollegesController::fillRootNodeNameToLinks($orderByUrl);
+        ParseallcollegesController::fillFeaturedFromTop($orderByUrl, $rootNodeNameToLinks);
 
         return $this->render('index', [
             'echoText' => ParseallcollegesController::generateEchoText($nodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks),

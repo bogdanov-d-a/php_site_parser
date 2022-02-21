@@ -90,4 +90,9 @@ class Utils
         }
         return $result;
     }
+
+    public static function BoolToStr($bool)
+    {
+        return $bool ? 'true' : 'false';
+    }
 }
