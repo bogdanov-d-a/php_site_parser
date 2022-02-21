@@ -52,12 +52,26 @@ class ParseallcollegesController extends Controller
         }
     }
 
-    private static function generateEchoText($nodePathsCommonRoot, $orderByUrl)
+    private static function fillRootNodeNameToLinks($orderByUrl)
     {
-        $result = '';
-        $result .= implode('/', $nodePathsCommonRoot) . '<br/>';
-        $result .= '<br/>';
+        $result = [];
+        foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
+        {
+            foreach ($orderByUrlValue as $orderByUrlValueItem)
+            {
+                $rootNodeName = $orderByUrlValueItem['nodePath'][0];
+                if (!array_key_exists($rootNodeName, $result))
+                {
+                    $result[$rootNodeName] = [];
+                }
+                $result[$rootNodeName][$orderByUrlKey] = true;
+            }
+        }
+        return $result;
+    }
 
+    private static function generateEchoOrderByUrlText($orderByUrl, &$result)
+    {
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
         {
             $result .= $orderByUrlKey . '<br/>';
@@ -67,6 +81,29 @@ class ParseallcollegesController extends Controller
             }
             $result .= '<br/>';
         }
+    }
+
+    private static function generateEchoRootNodeNameToLinksText($rootNodeNameToLinks, &$result)
+    {
+        foreach ($rootNodeNameToLinks as $rootNodeName => $links)
+        {
+            $result .= $rootNodeName . '<br/>';
+            foreach ($links as $linksKey => $linksValue)
+            {
+                $result .= $linksKey . '<br/>';
+            }
+            $result .= '<br/>';
+        }
+    }
+
+    private static function generateEchoText($nodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks)
+    {
+        $result = '';
+        $result .= implode('/', $nodePathsCommonRoot) . '<br/>';
+        $result .= '<br/>';
+
+        ParseallcollegesController::generateEchoOrderByUrlText($orderByUrl, $result);
+        ParseallcollegesController::generateEchoRootNodeNameToLinksText($rootNodeNameToLinks, $result);
 
         return $result;
     }
@@ -83,8 +120,10 @@ class ParseallcollegesController extends Controller
 
         ParseallcollegesController::stripNodePaths($orderByUrl, $nodePathsEqualItemCount);
 
+        $rootNodeNameToLinks = ParseallcollegesController::fillRootNodeNameToLinks($orderByUrl);
+
         return $this->render('index', [
-            'echoText' => ParseallcollegesController::generateEchoText($nodePathsCommonRoot, $orderByUrl),
+            'echoText' => ParseallcollegesController::generateEchoText($nodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks),
         ]);
     }
 }
