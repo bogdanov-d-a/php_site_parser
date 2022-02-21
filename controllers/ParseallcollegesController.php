@@ -157,6 +157,22 @@ class ParseallcollegesController extends Controller
         }
     }
 
+    private static function parsePageCount($str)
+    {
+        if (preg_match('/^Page \d+ of (\d+)$/', $str, $matches) == false)
+        {
+            throw new \Exception('parsePageCount preg_match(...) == false');
+        }
+        return intval($matches[1]);
+    }
+
+    private static function findPageCount($nodePathsCommonRoot, $xpath)
+    {
+        $paginatorNodePath = array_merge($nodePathsCommonRoot, ['div[last()]', 'div']);
+        $paginatorNode = ParseallcollegesController::findOneNodeByPath($xpath, $paginatorNodePath);
+        return ParseallcollegesController::parsePageCount($paginatorNode->nodeValue);
+    }
+
     private static function generateEchoOrderByUrlText($orderByUrl, &$result)
     {
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
@@ -188,11 +204,12 @@ class ParseallcollegesController extends Controller
         }
     }
 
-    private static function generateEchoText($nodePathsCommonRoot, $featuredNodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks)
+    private static function generateEchoText($nodePathsCommonRoot, $featuredNodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks, $pageCount)
     {
         $result = '';
         $result .= implode('/', $nodePathsCommonRoot) . '<br/>';
         $result .= implode('/', $featuredNodePathsCommonRoot) . '<br/>';
+        $result .= $pageCount . '<br/>';
         $result .= '<br/>';
 
         ParseallcollegesController::generateEchoOrderByUrlText($orderByUrl, $result);
@@ -213,6 +230,8 @@ class ParseallcollegesController extends Controller
         $nodePathsCommonRoot = Utils::TrimArray($allNodePaths[0], $nodePathsEqualItemCount);
         ParseallcollegesController::stripNodePaths($orderByUrl, false, $nodePathsEqualItemCount);
 
+        $pageCount = ParseallcollegesController::findPageCount($nodePathsCommonRoot, $xpath);
+
         $rootNodeNameToLinks = ParseallcollegesController::fillRootNodeNameToLinks($orderByUrl);
         ParseallcollegesController::fillFeaturedFromTop($orderByUrl, $rootNodeNameToLinks);
 
@@ -225,7 +244,7 @@ class ParseallcollegesController extends Controller
         ParseallcollegesController::fillUniversityInfo($orderByUrl, $xpath, $nodePathsCommonRoot, $featuredNodePathsCommonRoot);
 
         return $this->render('index', [
-            'echoText' => ParseallcollegesController::generateEchoText($nodePathsCommonRoot, $featuredNodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks),
+            'echoText' => ParseallcollegesController::generateEchoText($nodePathsCommonRoot, $featuredNodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks, $pageCount),
         ]);
     }
 }
