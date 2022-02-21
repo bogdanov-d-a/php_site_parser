@@ -116,6 +116,32 @@ class ParseallcollegesController extends Controller
         }
     }
 
+    private static function findOneNodeByPath($xpath, $nodePath)
+    {
+        $entries = $xpath->query('/' . implode('/', $nodePath));
+        if (count($entries) != 1)
+        {
+            throw new Exception('findOneNodeByPath count($entries) != 1');
+        }
+        return $entries[0];
+    }
+
+    private static function fillUniversityInfo(&$orderByUrl, $xpath, $nodePathsCommonRoot, $featuredNodePathsCommonRoot)
+    {
+        foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
+        {
+            $nodePathRoot = $nodePathsCommonRoot;
+            if ($orderByUrlValue['isFeatured'])
+            {
+                $nodePathRoot = array_merge($nodePathRoot, $featuredNodePathsCommonRoot);
+            }
+
+            $headerNode = ParseallcollegesController::findOneNodeByPath($xpath, array_merge($nodePathRoot, $orderByUrlValue['nodes'][$orderByUrlValue['headerNodeIndex']]['nodePath']));
+
+            $orderByUrlValue['universityName'] = $headerNode->nodeValue;
+        }
+    }
+
     private static function generateEchoOrderByUrlText($orderByUrl, &$result)
     {
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
@@ -123,6 +149,7 @@ class ParseallcollegesController extends Controller
             $result .= $orderByUrlKey . '<br/>';
             $result .= Utils::BoolToStr($orderByUrlValue['isFeatured']) . '<br/>';
             $result .= $orderByUrlValue['headerNodeIndex'] . '<br/>';
+            $result .= $orderByUrlValue['universityName'] . '<br/>';
             foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
             {
                 $result .= implode('/', $orderByUrlValueNode['nodePath']) . '<br/>';
@@ -160,6 +187,7 @@ class ParseallcollegesController extends Controller
     public function actionIndex()
     {
         $doc = Utils::ParseHtml(Utils::GetHtml('https://www.princetonreview.com/college-search?ceid=cp-1022984'));
+        $xpath = new \DOMXPath($doc);
 
         $orderByUrl = ParseallcollegesController::fillOrderByUrl($doc);
         $allNodePaths = ParseallcollegesController::fillAllNodePaths($orderByUrl, false);
@@ -177,6 +205,7 @@ class ParseallcollegesController extends Controller
         ParseallcollegesController::stripNodePaths($orderByUrl, true, $featuredNodePathsEqualItemCount);
 
         ParseallcollegesController::fillHeaderNodeIndices($orderByUrl);
+        ParseallcollegesController::fillUniversityInfo($orderByUrl, $xpath, $nodePathsCommonRoot, $featuredNodePathsCommonRoot);
 
         return $this->render('index', [
             'echoText' => ParseallcollegesController::generateEchoText($nodePathsCommonRoot, $featuredNodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks),
