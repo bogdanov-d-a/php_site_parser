@@ -7,67 +7,84 @@ use app\controllers\Utils;
 
 class ParseallcollegesController extends Controller
 {
-    public function actionIndex()
+    private static function fillOrderByUrl($doc)
     {
-        $doc = Utils::ParseHtml(Utils::GetHtml('https://www.princetonreview.com/college-search?ceid=cp-1022984'));
-
-        $orderByUrl = [];
+        $result = [];
         foreach ($doc->getElementsByTagName('a') as $link)
         {
             $url = Utils::RemoveUrlQuery($link->getAttribute('href'));
             if (str_starts_with($url, '/college/'))
             {
-                if (!array_key_exists($url, $orderByUrl))
+                if (!array_key_exists($url, $result))
                 {
-                    $orderByUrl[$url] = [];
+                    $result[$url] = [];
                 }
-                $orderByUrl[$url][] = [
+                $result[$url][] = [
                     'node' => $link,
                     'nodePath' => explode('/', $link->getNodePath()),
                 ];
             }
         }
+        return $result;
+    }
 
-        $allNodePaths = [];
+    private static function fillAllNodePaths($orderByUrl)
+    {
+        $result = [];
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
         {
             foreach ($orderByUrlValue as $orderByUrlValueItem)
             {
-                $allNodePaths[] = $orderByUrlValueItem['nodePath'];
+                $result[] = $orderByUrlValueItem['nodePath'];
             }
         }
+        return $result;
+    }
+
+    private static function stripNodePaths(&$orderByUrl, $nodePathsEqualItemCount)
+    {
+        foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
+        {
+            foreach ($orderByUrlValue as &$orderByUrlValueItem)
+            {
+                $orderByUrlValueItem['nodePath'] = Utils::StripArrayBeginning($orderByUrlValueItem['nodePath'], $nodePathsEqualItemCount);
+            }
+        }
+    }
+
+    private static function generateEchoText($nodePathsCommonRoot, $orderByUrl)
+    {
+        $result = '';
+        $result .= implode('/', $nodePathsCommonRoot) . '<br/>';
+        $result .= '<br/>';
+
+        foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
+        {
+            $result .= $orderByUrlKey . '<br/>';
+            foreach ($orderByUrlValue as $orderByUrlValueItem)
+            {
+                $result .= implode('/', $orderByUrlValueItem['nodePath']) . '<br/>';
+            }
+            $result .= '<br/>';
+        }
+
+        return $result;
+    }
+
+    public function actionIndex()
+    {
+        $doc = Utils::ParseHtml(Utils::GetHtml('https://www.princetonreview.com/college-search?ceid=cp-1022984'));
+
+        $orderByUrl = ParseallcollegesController::fillOrderByUrl($doc);
+        $allNodePaths = ParseallcollegesController::fillAllNodePaths($orderByUrl);
 
         $nodePathsEqualItemCount = Utils::EqualItemCountMulti($allNodePaths);
-        $nodePathsCommonRoot = implode('/', Utils::TrimArray($allNodePaths[0], $nodePathsEqualItemCount));
+        $nodePathsCommonRoot = Utils::TrimArray($allNodePaths[0], $nodePathsEqualItemCount);
 
-        foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValueRef)
-        {
-            foreach ($orderByUrlValueRef as &$orderByUrlValueItemRef)
-            {
-                $orderByUrlValueItemRef['nodePath'] = Utils::StripArrayBeginning($orderByUrlValueItemRef['nodePath'], $nodePathsEqualItemCount);
-            }
-            unset($orderByUrlValueItemRef);
-        }
-        unset($orderByUrlValueRef);
-
-        $echoText = '';
-        $echoText .= strval($nodePathsCommonRoot) . '<br/>';
-        $echoText .= '<br/>';
-
-        foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
-        {
-            $echoText .= $orderByUrlKey . '<br/>';
-
-            foreach ($orderByUrlValue as $orderByUrlValueItem)
-            {
-                $echoText .= implode('/', $orderByUrlValueItem['nodePath']) . '<br/>';
-            }
-
-            $echoText .= '<br/>';
-        }
+        ParseallcollegesController::stripNodePaths($orderByUrl, $nodePathsEqualItemCount);
 
         return $this->render('index', [
-            'echoText' => $echoText,
+            'echoText' => ParseallcollegesController::generateEchoText($nodePathsCommonRoot, $orderByUrl),
         ]);
     }
 }
