@@ -12,6 +12,8 @@ class ParseallcollegesController extends Controller
     {
         $parseResult = AllcollegesDataParser::parse();
 
+        Allcolleges::getDb()->createCommand('TRUNCATE `allcolleges`')->execute();
+
         foreach ($parseResult as $parseResultKey => $parseResultValue)
         {
             $ac = new Allcolleges();
