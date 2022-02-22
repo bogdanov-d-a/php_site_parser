@@ -6,6 +6,16 @@ use app\controllers\Utils;
 
 class AllcollegesDataParser
 {
+    private static function getUrl($page)
+    {
+        $url = 'https://www.princetonreview.com/college-search?ceid=cp-1022984';
+        if ($page != 1)
+        {
+            $url .= '&page=' . strval($page);
+        }
+        return $url;
+    }
+
     private static function fillOrderByUrl($doc)
     {
         $result = [];
@@ -182,9 +192,9 @@ class AllcollegesDataParser
         }
     }
 
-    public static function parse()
+    private static function parsePage($page)
     {
-        $doc = Utils::ParseHtml(Utils::GetHtml('https://www.princetonreview.com/college-search?ceid=cp-1022984'));
+        $doc = Utils::ParseHtml(Utils::GetHtml(AllcollegesDataParser::getUrl($page)));
         $xpath = new \DOMXPath($doc);
 
         $orderByUrl = AllcollegesDataParser::fillOrderByUrl($doc);
@@ -194,7 +204,7 @@ class AllcollegesDataParser
         $nodePathsCommonRoot = Utils::TrimArray($allNodePaths[0], $nodePathsEqualItemCount);
         AllcollegesDataParser::stripNodePaths($orderByUrl, false, $nodePathsEqualItemCount);
 
-        $pageCount = AllcollegesDataParser::findPageCount($nodePathsCommonRoot, $xpath);
+        $pageCount = ($page == 1) ? AllcollegesDataParser::findPageCount($nodePathsCommonRoot, $xpath) : false;
 
         $rootNodeNameToLinks = AllcollegesDataParser::fillRootNodeNameToLinks($orderByUrl);
         AllcollegesDataParser::fillFeaturedFromTop($orderByUrl, $rootNodeNameToLinks);
@@ -213,5 +223,20 @@ class AllcollegesDataParser
             'orderByUrl' => $orderByUrl,
             'pageCount' => $pageCount,
         ];
+    }
+
+    public static function parse()
+    {
+        $parsePage1Result = AllcollegesDataParser::parsePage(1);
+        $result = $parsePage1Result['orderByUrl'];
+        $pageCount = $parsePage1Result['pageCount'];
+
+        for ($pageNumber = 2; $pageNumber <= $pageCount; $pageNumber++)
+        {
+            sleep(1);  // reduce server request rate
+            $result = array_merge($result, AllcollegesDataParser::parsePage($pageNumber)['orderByUrl']);
+        }
+
+        return $result;
     }
 }

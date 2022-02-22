@@ -19,14 +19,10 @@ class ParseallcollegesController extends Controller
         }
     }
 
-    private static function generateEchoText($orderByUrl, $pageCount)
+    private static function generateEchoText($orderByUrl)
     {
         $result = '';
-        $result .= $pageCount . '<br/>';
-        $result .= '<br/>';
-
         ParseallcollegesController::generateEchoOrderByUrlText($orderByUrl, $result);
-
         return $result;
     }
 
@@ -34,9 +30,7 @@ class ParseallcollegesController extends Controller
     {
         $parseResult = AllcollegesDataParser::parse();
         return $this->render('index', [
-            'echoText' => ParseallcollegesController::generateEchoText(
-                $parseResult['orderByUrl'],
-                $parseResult['pageCount']),
+            'echoText' => ParseallcollegesController::generateEchoText($parseResult),
         ]);
     }
 }
