@@ -1,1 +1,1 @@
-<?= $echoText ?>
+"Parse all colleges" completed successfully
