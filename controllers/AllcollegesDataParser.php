@@ -231,6 +231,9 @@ class AllcollegesDataParser
         $result = $parsePage1Result['orderByUrl'];
         $pageCount = $parsePage1Result['pageCount'];
 
+        // for debugging purposes
+        $pageCount = 2;
+
         for ($pageNumber = 2; $pageNumber <= $pageCount; $pageNumber++)
         {
             sleep(1);  // reduce server request rate
