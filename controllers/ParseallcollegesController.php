@@ -13,7 +13,8 @@ class ParseallcollegesController extends Controller
         {
             $result .= $orderByUrlKey . '<br/>';
             $result .= $orderByUrlValue['universityName'] . '<br/>';
-            $result .= $orderByUrlValue['universityLocation'] . '<br/>';
+            $result .= $orderByUrlValue['universityCity'] . '<br/>';
+            $result .= $orderByUrlValue['universityState'] . '<br/>';
             $result .= $orderByUrlValue['universityImgUrl'] . '<br/>';
             $result .= '<br/>';
         }

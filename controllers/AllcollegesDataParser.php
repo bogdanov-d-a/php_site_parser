@@ -135,6 +135,16 @@ class AllcollegesDataParser
         return $entries[0];
     }
 
+    private static function parseUniversityLocation($location)
+    {
+        $locationParts = explode(', ', $location);
+        if (count($locationParts) != 2)
+        {
+            throw new \Exception('parseUniversityLocation count($locationParts) != 2');
+        }
+        return $locationParts;
+    }
+
     private static function fillUniversityInfo(&$orderByUrl, $xpath, $nodePathsCommonRoot, $featuredNodePathsCommonRoot)
     {
         foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
@@ -152,7 +162,10 @@ class AllcollegesDataParser
 
             $locationNodePath = array_merge(array_slice($headerNodePath, 0, array_search('h2', $headerNodePath)), ['div[1]']);
             $locationNode = AllcollegesDataParser::findOneNodeByPath($xpath, $locationNodePath);
-            $orderByUrlValue['universityLocation'] = $locationNode->nodeValue;
+
+            $universityLocation = AllcollegesDataParser::parseUniversityLocation($locationNode->nodeValue);
+            $orderByUrlValue['universityCity'] = $universityLocation[0];
+            $orderByUrlValue['universityState'] = $universityLocation[1];
 
             $universityNodePathRoot = array_merge($nodePathRoot, [$headerNodePathRelative[0]]);
             $universityNodeRoot = AllcollegesDataParser::findOneNodeByPath($xpath, $universityNodePathRoot);
