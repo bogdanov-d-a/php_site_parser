@@ -172,6 +172,16 @@ class AllcollegesDataParser
         return AllcollegesDataParser::parsePageCount($paginatorNode->nodeValue);
     }
 
+    private static function removeTemporaryData(&$orderByUrl)
+    {
+        foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
+        {
+            unset($orderByUrlValue['isFeatured']);
+            unset($orderByUrlValue['headerNodeIndex']);
+            unset($orderByUrlValue['nodes']);
+        }
+    }
+
     public static function parse()
     {
         $doc = Utils::ParseHtml(Utils::GetHtml('https://www.princetonreview.com/college-search?ceid=cp-1022984'));
@@ -197,11 +207,10 @@ class AllcollegesDataParser
         AllcollegesDataParser::fillHeaderNodeIndices($orderByUrl);
         AllcollegesDataParser::fillUniversityInfo($orderByUrl, $xpath, $nodePathsCommonRoot, $featuredNodePathsCommonRoot);
 
+        AllcollegesDataParser::removeTemporaryData($orderByUrl);
+
         return [
-            'nodePathsCommonRoot' => $nodePathsCommonRoot,
-            'featuredNodePathsCommonRoot' => $featuredNodePathsCommonRoot,
             'orderByUrl' => $orderByUrl,
-            'rootNodeNameToLinks' => $rootNodeNameToLinks,
             'pageCount' => $pageCount,
         ];
     }

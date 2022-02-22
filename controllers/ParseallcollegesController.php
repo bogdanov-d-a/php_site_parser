@@ -12,42 +12,20 @@ class ParseallcollegesController extends Controller
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
         {
             $result .= $orderByUrlKey . '<br/>';
-            $result .= Utils::BoolToStr($orderByUrlValue['isFeatured']) . '<br/>';
-            $result .= $orderByUrlValue['headerNodeIndex'] . '<br/>';
             $result .= $orderByUrlValue['universityName'] . '<br/>';
             $result .= $orderByUrlValue['universityLocation'] . '<br/>';
             $result .= $orderByUrlValue['universityImgUrl'] . '<br/>';
-            foreach ($orderByUrlValue['nodes'] as $orderByUrlValueNode)
-            {
-                $result .= implode('/', $orderByUrlValueNode['nodePath']) . '<br/>';
-            }
             $result .= '<br/>';
         }
     }
 
-    private static function generateEchoRootNodeNameToLinksText($rootNodeNameToLinks, &$result)
-    {
-        foreach ($rootNodeNameToLinks as $rootNodeName => $links)
-        {
-            $result .= $rootNodeName . '<br/>';
-            foreach ($links as $linksKey => $linksValue)
-            {
-                $result .= $linksKey . '<br/>';
-            }
-            $result .= '<br/>';
-        }
-    }
-
-    private static function generateEchoText($nodePathsCommonRoot, $featuredNodePathsCommonRoot, $orderByUrl, $rootNodeNameToLinks, $pageCount)
+    private static function generateEchoText($orderByUrl, $pageCount)
     {
         $result = '';
-        $result .= implode('/', $nodePathsCommonRoot) . '<br/>';
-        $result .= implode('/', $featuredNodePathsCommonRoot) . '<br/>';
         $result .= $pageCount . '<br/>';
         $result .= '<br/>';
 
         ParseallcollegesController::generateEchoOrderByUrlText($orderByUrl, $result);
-        ParseallcollegesController::generateEchoRootNodeNameToLinksText($rootNodeNameToLinks, $result);
 
         return $result;
     }
@@ -57,10 +35,7 @@ class ParseallcollegesController extends Controller
         $parseResult = AllcollegesDataParser::parse();
         return $this->render('index', [
             'echoText' => ParseallcollegesController::generateEchoText(
-                $parseResult['nodePathsCommonRoot'],
-                $parseResult['featuredNodePathsCommonRoot'],
                 $parseResult['orderByUrl'],
-                $parseResult['rootNodeNameToLinks'],
                 $parseResult['pageCount']),
         ]);
     }
