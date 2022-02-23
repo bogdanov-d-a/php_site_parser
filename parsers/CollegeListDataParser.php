@@ -255,7 +255,7 @@ class CollegeListDataParser
         $pageCount = $parsePage1Result['pageCount'];
 
         // for debugging purposes
-        $pageCount = 2;
+        //$pageCount = 2;
 
         for ($pageNumber = 2; $pageNumber <= $pageCount; $pageNumber++)
         {
