@@ -47,6 +47,45 @@ class OnecollegeDataParser
         return $result;
     }
 
+    private static function parseCampusVisitsContactNodeRow($node)
+    {
+        $result = [];
+        foreach ($node->childNodes as $elem)
+        {
+            if ($elem->nodeName == 'div')
+            {
+                $result[] = $elem;
+            }
+        }
+        if (count($result) != 2)
+        {
+            throw new \Exception('parseCampusVisitsContactNodeRow count($result) != 2');
+        }
+        $result[0] = Utils::CleanupString($result[0]->nodeValue);
+        return $result;
+    }
+
+    private static function parseCampusVisitsContactNode($node)
+    {
+        $result = [];
+        foreach ($node->childNodes as $rowNode)
+        {
+            if ($rowNode->nodeName == 'div')
+            {
+                $parseResult = OnecollegeDataParser::parseCampusVisitsContactNodeRow($rowNode);
+                if ($parseResult[0] == 'Address')
+                {
+                    $result[$parseResult[0]] = OnecollegeDataParser::parseAddress($parseResult[1]);
+                }
+                elseif ($parseResult[0] == 'Phone')
+                {
+                    $result[$parseResult[0]] = Utils::CleanupString($parseResult[1]->nodeValue);
+                }
+            }
+        }
+        return $result;
+    }
+
     public static function parse($url)
     {
         $doc = Utils::ParseHtml(Utils::GetHtml($url));
@@ -58,11 +97,9 @@ class OnecollegeDataParser
         $popNode = array_pop($campusVisitsContactNodePath);
         $campusVisitsContactNodePath = array_merge($campusVisitsContactNodePath, [OnecollegeDataParser::getNextNode($popNode)]);
 
-        $addressNodePath = array_merge($campusVisitsContactNodePath, [Utils::BuildNthNode('div', 1), Utils::BuildNthNode('div', 2)]);
-        $result['address'] = OnecollegeDataParser::parseAddress(Utils::FindOneNodeByPath($xpath, $addressNodePath));
-
-        $phoneNodePath = array_merge($campusVisitsContactNodePath, [Utils::BuildNthNode('div', 2), Utils::BuildNthNode('div', 2)]);
-        $result['phone'] = Utils::CleanupString(Utils::FindOneNodeByPath($xpath, $phoneNodePath)->nodeValue);
+        $parseCampusVisitsContactNodeResult = OnecollegeDataParser::parseCampusVisitsContactNode(Utils::FindOneNodeByPath($xpath, $campusVisitsContactNodePath));
+        $result['address'] = $parseCampusVisitsContactNodeResult['Address'];
+        $result['phone'] = $parseCampusVisitsContactNodeResult['Phone'];
 
         $websiteLinkTextNodePath = explode('/', OnecollegeDataParser::findWebsiteLinkTextNode($doc)->getNodePath());
         array_pop($websiteLinkTextNodePath);
