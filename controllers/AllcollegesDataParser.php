@@ -207,7 +207,7 @@ class AllcollegesDataParser
         $allNodePaths = AllcollegesDataParser::fillAllNodePaths($orderByUrl, false);
 
         $nodePathsEqualItemCount = Utils::EqualItemCountMulti($allNodePaths);
-        $nodePathsCommonRoot = Utils::TrimArray($allNodePaths[0], $nodePathsEqualItemCount);
+        $nodePathsCommonRoot = array_slice($allNodePaths[0], 0, $nodePathsEqualItemCount);
         AllcollegesDataParser::stripNodePaths($orderByUrl, false, $nodePathsEqualItemCount);
 
         $pageCount = ($page == 1) ? AllcollegesDataParser::findPageCount($nodePathsCommonRoot, $xpath) : false;
@@ -217,7 +217,7 @@ class AllcollegesDataParser
 
         $allFeaturedNodePaths = AllcollegesDataParser::fillAllNodePaths($orderByUrl, true);
         $featuredNodePathsEqualItemCount = Utils::EqualItemCountMulti($allFeaturedNodePaths);
-        $featuredNodePathsCommonRoot = Utils::TrimArray($allFeaturedNodePaths[0], $featuredNodePathsEqualItemCount);
+        $featuredNodePathsCommonRoot = array_slice($allFeaturedNodePaths[0], 0, $featuredNodePathsEqualItemCount);
         AllcollegesDataParser::stripNodePaths($orderByUrl, true, $featuredNodePathsEqualItemCount);
 
         AllcollegesDataParser::fillHeaderNodeIndices($orderByUrl);

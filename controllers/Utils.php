@@ -75,22 +75,6 @@ class Utils
         return $result;
     }
 
-    public static function TrimArray($array, $count)
-    {
-        $arrayCount = count($array);
-        if ($arrayCount < $count)
-        {
-            throw new Exception('TrimArray $arrayCount < $count');
-        }
-
-        $result = [];
-        for ($i = 0; $i < $count; $i++)
-        {
-            $result[] = $array[$i];
-        }
-        return $result;
-    }
-
     public static function BoolToStr($bool)
     {
         return $bool ? 'true' : 'false';
