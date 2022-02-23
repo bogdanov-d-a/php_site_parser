@@ -59,22 +59,6 @@ class Utils
         return $result;
     }
 
-    public static function StripArrayBeginning($array, $count)
-    {
-        $arrayCount = count($array);
-        if ($arrayCount < $count)
-        {
-            throw new Exception('StripArrayBeginning $arrayCount < $count');
-        }
-
-        $result = [];
-        for ($i = $count; $i < $arrayCount; $i++)
-        {
-            $result[] = $array[$i];
-        }
-        return $result;
-    }
-
     public static function BoolToStr($bool)
     {
         return $bool ? 'true' : 'false';

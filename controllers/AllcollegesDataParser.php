@@ -62,7 +62,7 @@ class AllcollegesDataParser
             {
                 foreach ($orderByUrlValue['nodes'] as &$orderByUrlValueNode)
                 {
-                    $orderByUrlValueNode['nodePath'] = Utils::StripArrayBeginning($orderByUrlValueNode['nodePath'], $nodePathsEqualItemCount);
+                    $orderByUrlValueNode['nodePath'] = array_slice($orderByUrlValueNode['nodePath'], $nodePathsEqualItemCount);
                 }
             }
         }
