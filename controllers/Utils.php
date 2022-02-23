@@ -17,7 +17,7 @@ class Utils
     {
         libxml_use_internal_errors(true); // Prevent HTML errors from displaying
         $doc = new \DOMDocument();
-        $doc->loadHTML($html);
+        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         return $doc;
     }
 
