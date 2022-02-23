@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\controllers\Utils;
+use yii\BaseYii;
 
 class AllcollegesDataParser
 {
@@ -197,6 +198,8 @@ class AllcollegesDataParser
 
     private static function parsePage($page)
     {
+        BaseYii::debug('AllcollegesDataParser parsePage ' . strval($page));
+
         $doc = Utils::ParseHtml(Utils::GetHtml(AllcollegesDataParser::getUrl($page)));
         $xpath = new \DOMXPath($doc);
 
