@@ -46,7 +46,7 @@ class Utils
         $arraysCount = count($arrays);
         if ($arraysCount < 2)
         {
-            throw new Exception('EqualItemCountMulti $arraysCount < 2');
+            throw new \Exception('EqualItemCountMulti $arraysCount < 2');
         }
 
         $result = Utils::EqualItemCount($arrays[0], $arrays[1]);
