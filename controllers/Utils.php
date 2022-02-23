@@ -95,4 +95,36 @@ class Utils
     {
         return $bool ? 'true' : 'false';
     }
+
+    public static function ParseNthNode($str)
+    {
+        if (preg_match('/^(\w+)\[(\w+)\]$/', $str, $matches) == false)
+        {
+            throw new \Exception('ParseNthNode preg_match(...) == false');
+        }
+        return [
+            'name' => $matches[1],
+            'index' => intval($matches[2]),
+        ];
+    }
+
+    public static function BuildNthNode($name, $index)
+    {
+        return $name . '[' . strval($index) . ']';
+    }
+
+    public static function FindOneNodeByPath($xpath, $nodePath)
+    {
+        $entries = $xpath->query('/' . implode('/', $nodePath));
+        if (count($entries) != 1)
+        {
+            throw new \Exception('FindOneNodeByPath count($entries) != 1');
+        }
+        return $entries[0];
+    }
+
+    public static function CleanupString($str)
+    {
+        return preg_replace('/[\r\n\t\f\v]+/', '', $str);
+    }
 }

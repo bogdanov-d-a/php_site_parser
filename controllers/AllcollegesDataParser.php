@@ -125,16 +125,6 @@ class AllcollegesDataParser
         }
     }
 
-    private static function findOneNodeByPath($xpath, $nodePath)
-    {
-        $entries = $xpath->query('/' . implode('/', $nodePath));
-        if (count($entries) != 1)
-        {
-            throw new \Exception('findOneNodeByPath count($entries) != 1');
-        }
-        return $entries[0];
-    }
-
     private static function parseUniversityLocation($location)
     {
         $locationParts = explode(', ', $location);
@@ -157,18 +147,18 @@ class AllcollegesDataParser
 
             $headerNodePathRelative = $orderByUrlValue['nodes'][$orderByUrlValue['headerNodeIndex']]['nodePath'];
             $headerNodePath = array_merge($nodePathRoot, $headerNodePathRelative);
-            $headerNode = AllcollegesDataParser::findOneNodeByPath($xpath, $headerNodePath);
+            $headerNode = Utils::FindOneNodeByPath($xpath, $headerNodePath);
             $orderByUrlValue['universityName'] = $headerNode->nodeValue;
 
             $locationNodePath = array_merge(array_slice($headerNodePath, 0, array_search('h2', $headerNodePath)), ['div[1]']);
-            $locationNode = AllcollegesDataParser::findOneNodeByPath($xpath, $locationNodePath);
+            $locationNode = Utils::FindOneNodeByPath($xpath, $locationNodePath);
 
             $universityLocation = AllcollegesDataParser::parseUniversityLocation($locationNode->nodeValue);
             $orderByUrlValue['universityCity'] = $universityLocation[0];
             $orderByUrlValue['universityState'] = $universityLocation[1];
 
             $universityNodePathRoot = array_merge($nodePathRoot, [$headerNodePathRelative[0]]);
-            $universityNodeRoot = AllcollegesDataParser::findOneNodeByPath($xpath, $universityNodePathRoot);
+            $universityNodeRoot = Utils::FindOneNodeByPath($xpath, $universityNodePathRoot);
 
             $imgElements = $universityNodeRoot->getElementsByTagName('img');
             if (count($imgElements) > 1)
@@ -191,7 +181,7 @@ class AllcollegesDataParser
     private static function findPageCount($nodePathsCommonRoot, $xpath)
     {
         $paginatorNodePath = array_merge($nodePathsCommonRoot, ['div[last()]', 'div']);
-        $paginatorNode = AllcollegesDataParser::findOneNodeByPath($xpath, $paginatorNodePath);
+        $paginatorNode = Utils::FindOneNodeByPath($xpath, $paginatorNodePath);
         return AllcollegesDataParser::parsePageCount($paginatorNode->nodeValue);
     }
 
