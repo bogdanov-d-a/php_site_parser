@@ -86,7 +86,7 @@ class Utils
         $entries = $xpath->query('/' . implode('/', $nodePath));
         if (count($entries) != 1)
         {
-            throw new \Exception('FindOneNodeByPath count($entries) != 1');
+            return false;
         }
         return $entries[0];
     }

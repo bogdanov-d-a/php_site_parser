@@ -103,15 +103,30 @@ class OnecollegeDataParser
             $popNode = array_pop($campusVisitsContactNodePath);
             $campusVisitsContactNodePath = array_merge($campusVisitsContactNodePath, [OnecollegeDataParser::getNextNode($popNode)]);
 
-            OnecollegeDataParser::parseCampusVisitsContactNode(Utils::FindOneNodeByPath($xpath, $campusVisitsContactNodePath), $result);
+            $campusVisitsContactNode = Utils::FindOneNodeByPath($xpath, $campusVisitsContactNodePath);
+            if ($campusVisitsContactNode === false)
+            {
+                throw new \Exception('parse $campusVisitsContactNode === false');
+            }
+            OnecollegeDataParser::parseCampusVisitsContactNode($campusVisitsContactNode, $result);
         }
 
         $websiteLinkTextNodePath = explode('/', OnecollegeDataParser::findWebsiteLinkTextNode($doc)->getNodePath());
         array_pop($websiteLinkTextNodePath);
-        $result['siteurl'] = Utils::FindOneNodeByPath($xpath, $websiteLinkTextNodePath)->getAttribute('href');
+        $websiteLinkTextNode = Utils::FindOneNodeByPath($xpath, $websiteLinkTextNodePath);
+        if ($websiteLinkTextNode === false)
+        {
+            throw new \Exception('parse $websiteLinkTextNode === false');
+        }
+        $result['siteurl'] = $websiteLinkTextNode->getAttribute('href');
 
         $nameNodePath = array_merge(array_slice($websiteLinkTextNodePath, 0, -3), ['h1', 'span']);
-        $result['name'] = Utils::FindOneNodeByPath($xpath, $nameNodePath)->nodeValue;
+        $nameNode = Utils::FindOneNodeByPath($xpath, $nameNodePath);
+        if ($nameNode === false)
+        {
+            throw new \Exception('parse $nameNode === false');
+        }
+        $result['name'] = $nameNode->nodeValue;
 
         return $result;
     }
