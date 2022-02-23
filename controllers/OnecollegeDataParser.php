@@ -17,7 +17,7 @@ class OnecollegeDataParser
         }
     }
 
-    private static function findWebsiteLinkText($doc)
+    private static function findWebsiteLinkTextNode($doc)
     {
         foreach ($doc->getElementsByTagName('strong') as $elem)
         {
@@ -63,6 +63,10 @@ class OnecollegeDataParser
 
         $phoneNodePath = array_merge($campusVisitsContactNodePath, [Utils::BuildNthNode('div', 2), Utils::BuildNthNode('div', 2)]);
         $result['phone'] = Utils::CleanupString(Utils::FindOneNodeByPath($xpath, $phoneNodePath)->nodeValue);
+
+        $websiteLinkTextNodePath = explode('/', OnecollegeDataParser::findWebsiteLinkTextNode($doc)->getNodePath());
+        array_pop($websiteLinkTextNodePath);
+        $result['siteurl'] = Utils::FindOneNodeByPath($xpath, $websiteLinkTextNodePath)->getAttribute('href');
 
         return $result;
     }
