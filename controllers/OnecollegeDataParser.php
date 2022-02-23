@@ -15,6 +15,7 @@ class OnecollegeDataParser
                 return $elem;
             }
         }
+        return false;
     }
 
     private static function findWebsiteLinkTextNode($doc)
@@ -26,6 +27,7 @@ class OnecollegeDataParser
                 return $elem;
             }
         }
+        throw new \Exception('findWebsiteLinkTextNode not found');
     }
 
     private static function getNextNode($str)
@@ -65,9 +67,8 @@ class OnecollegeDataParser
         return $result;
     }
 
-    private static function parseCampusVisitsContactNode($node)
+    private static function parseCampusVisitsContactNode($node, &$result)
     {
-        $result = [];
         foreach ($node->childNodes as $rowNode)
         {
             if ($rowNode->nodeName == 'div')
@@ -75,15 +76,14 @@ class OnecollegeDataParser
                 $parseResult = OnecollegeDataParser::parseCampusVisitsContactNodeRow($rowNode);
                 if ($parseResult[0] == 'Address')
                 {
-                    $result[$parseResult[0]] = OnecollegeDataParser::parseAddress($parseResult[1]);
+                    $result['address'] = OnecollegeDataParser::parseAddress($parseResult[1]);
                 }
                 elseif ($parseResult[0] == 'Phone')
                 {
-                    $result[$parseResult[0]] = Utils::CleanupString($parseResult[1]->nodeValue);
+                    $result['phone'] = Utils::CleanupString($parseResult[1]->nodeValue);
                 }
             }
         }
-        return $result;
     }
 
     public static function parse($url)
@@ -92,14 +92,19 @@ class OnecollegeDataParser
         $xpath = new \DOMXPath($doc);
         $result = [];
 
-        $campusVisitsContactNodePath = explode('/', OnecollegeDataParser::findCampusVisitsContactNode($doc)->getNodePath());
-        array_pop($campusVisitsContactNodePath);
-        $popNode = array_pop($campusVisitsContactNodePath);
-        $campusVisitsContactNodePath = array_merge($campusVisitsContactNodePath, [OnecollegeDataParser::getNextNode($popNode)]);
+        $result['address'] = '';
+        $result['phone'] = '';
 
-        $parseCampusVisitsContactNodeResult = OnecollegeDataParser::parseCampusVisitsContactNode(Utils::FindOneNodeByPath($xpath, $campusVisitsContactNodePath));
-        $result['address'] = $parseCampusVisitsContactNodeResult['Address'];
-        $result['phone'] = $parseCampusVisitsContactNodeResult['Phone'];
+        $findCampusVisitsContactNodeResult = OnecollegeDataParser::findCampusVisitsContactNode($doc);
+        if ($findCampusVisitsContactNodeResult !== false)
+        {
+            $campusVisitsContactNodePath = explode('/', $findCampusVisitsContactNodeResult->getNodePath());
+            array_pop($campusVisitsContactNodePath);
+            $popNode = array_pop($campusVisitsContactNodePath);
+            $campusVisitsContactNodePath = array_merge($campusVisitsContactNodePath, [OnecollegeDataParser::getNextNode($popNode)]);
+
+            OnecollegeDataParser::parseCampusVisitsContactNode(Utils::FindOneNodeByPath($xpath, $campusVisitsContactNodePath), $result);
+        }
 
         $websiteLinkTextNodePath = explode('/', OnecollegeDataParser::findWebsiteLinkTextNode($doc)->getNodePath());
         array_pop($websiteLinkTextNodePath);
