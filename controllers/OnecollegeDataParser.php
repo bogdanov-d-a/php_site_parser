@@ -68,6 +68,9 @@ class OnecollegeDataParser
         array_pop($websiteLinkTextNodePath);
         $result['siteurl'] = Utils::FindOneNodeByPath($xpath, $websiteLinkTextNodePath)->getAttribute('href');
 
+        $nameNodePath = array_merge(array_slice($websiteLinkTextNodePath, 0, -3), ['h1', 'span']);
+        $result['name'] = Utils::FindOneNodeByPath($xpath, $nameNodePath)->nodeValue;
+
         return $result;
     }
 }
