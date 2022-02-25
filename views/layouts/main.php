@@ -40,8 +40,8 @@ AppAsset::register($this);
             ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'Parse college_list', 'url' => ['/parse-college-list/index']],
             ['label' => 'View college_list', 'url' => ['/college-list/index']],
-            ['label' => 'Parse one college', 'url' => ['/parseonecollege/index']],
-            ['label' => 'View one college', 'url' => ['/onecollege/index']],
+            ['label' => 'Parse college_card', 'url' => ['/parse-college-card/index']],
+            ['label' => 'View college_card', 'url' => ['/college-card/index']],
             ['label' => 'About', 'url' => ['/site/about']],
             ['label' => 'Contact', 'url' => ['/site/contact']],
             Yii::$app->user->isGuest ? (

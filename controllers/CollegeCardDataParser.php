@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use app\controllers\Utils;
 
-class OnecollegeDataParser
+class CollegeCardDataParser
 {
     private static function findCampusVisitsContactNode($doc)
     {
@@ -73,10 +73,10 @@ class OnecollegeDataParser
         {
             if ($rowNode->nodeName == 'div')
             {
-                $parseResult = OnecollegeDataParser::parseCampusVisitsContactNodeRow($rowNode);
+                $parseResult = CollegeCardDataParser::parseCampusVisitsContactNodeRow($rowNode);
                 if ($parseResult[0] == 'Address')
                 {
-                    $result['address'] = OnecollegeDataParser::parseAddress($parseResult[1]);
+                    $result['address'] = CollegeCardDataParser::parseAddress($parseResult[1]);
                 }
                 elseif ($parseResult[0] == 'Phone')
                 {
@@ -95,23 +95,23 @@ class OnecollegeDataParser
         $result['address'] = '';
         $result['phone'] = '';
 
-        $findCampusVisitsContactNodeResult = OnecollegeDataParser::findCampusVisitsContactNode($doc);
+        $findCampusVisitsContactNodeResult = CollegeCardDataParser::findCampusVisitsContactNode($doc);
         if ($findCampusVisitsContactNodeResult !== false)
         {
             $campusVisitsContactNodePath = explode('/', $findCampusVisitsContactNodeResult->getNodePath());
             array_pop($campusVisitsContactNodePath);
             $popNode = array_pop($campusVisitsContactNodePath);
-            $campusVisitsContactNodePath = array_merge($campusVisitsContactNodePath, [OnecollegeDataParser::getNextNode($popNode)]);
+            $campusVisitsContactNodePath = array_merge($campusVisitsContactNodePath, [CollegeCardDataParser::getNextNode($popNode)]);
 
             $campusVisitsContactNode = Utils::FindOneNodeByPath($xpath, $campusVisitsContactNodePath);
             if ($campusVisitsContactNode === false)
             {
                 throw new \Exception('parse $campusVisitsContactNode === false');
             }
-            OnecollegeDataParser::parseCampusVisitsContactNode($campusVisitsContactNode, $result);
+            CollegeCardDataParser::parseCampusVisitsContactNode($campusVisitsContactNode, $result);
         }
 
-        $websiteLinkTextNodePath = explode('/', OnecollegeDataParser::findWebsiteLinkTextNode($doc)->getNodePath());
+        $websiteLinkTextNodePath = explode('/', CollegeCardDataParser::findWebsiteLinkTextNode($doc)->getNodePath());
         array_pop($websiteLinkTextNodePath);
         $websiteLinkTextNode = Utils::FindOneNodeByPath($xpath, $websiteLinkTextNodePath);
         if ($websiteLinkTextNode === false)
