@@ -3,20 +3,20 @@
 namespace app\controllers;
 
 use yii\web\Controller;
-use app\controllers\AllcollegesDataParser;
-use app\models\Allcolleges;
+use app\controllers\CollegeListDataParser;
+use app\models\CollegeList;
 
-class ParseallcollegesController extends Controller
+class ParseCollegeListController extends Controller
 {
     public function actionIndex()
     {
-        $parseResult = AllcollegesDataParser::parse();
+        $parseResult = CollegeListDataParser::parse();
 
-        Allcolleges::getDb()->createCommand('TRUNCATE `allcolleges`')->execute();
+        CollegeList::getDb()->createCommand('TRUNCATE `college_list`')->execute();
 
         foreach ($parseResult as $parseResultKey => $parseResultValue)
         {
-            $ac = new Allcolleges();
+            $ac = new CollegeList();
             $ac->imgurl = $parseResultValue['universityImgUrl'];
             $ac->name = $parseResultValue['universityName'];
             $ac->city = $parseResultValue['universityCity'];

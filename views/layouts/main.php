@@ -38,8 +38,8 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Parse all colleges', 'url' => ['/parseallcolleges/index']],
-            ['label' => 'View all colleges', 'url' => ['/allcolleges/index']],
+            ['label' => 'Parse college_list', 'url' => ['/parse-college-list/index']],
+            ['label' => 'View college_list', 'url' => ['/college-list/index']],
             ['label' => 'Parse one college', 'url' => ['/parseonecollege/index']],
             ['label' => 'View one college', 'url' => ['/onecollege/index']],
             ['label' => 'About', 'url' => ['/site/about']],

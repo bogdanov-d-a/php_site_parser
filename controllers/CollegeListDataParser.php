@@ -5,7 +5,7 @@ namespace app\controllers;
 use app\controllers\Utils;
 use yii\BaseYii;
 
-class AllcollegesDataParser
+class CollegeListDataParser
 {
     private static function getUrl($page)
     {
@@ -163,7 +163,7 @@ class AllcollegesDataParser
 
             if ($locationNode !== false && $locationNode->getAttribute('class') == 'location')
             {
-                $universityLocation = AllcollegesDataParser::parseUniversityLocation($locationNode->nodeValue);
+                $universityLocation = CollegeListDataParser::parseUniversityLocation($locationNode->nodeValue);
                 $orderByUrlValue['universityCity'] = $universityLocation[0];
                 $orderByUrlValue['universityState'] = $universityLocation[1];
             }
@@ -201,7 +201,7 @@ class AllcollegesDataParser
         {
             throw new \Exception('findPageCount $paginatorNode === false');
         }
-        return AllcollegesDataParser::parsePageCount($paginatorNode->nodeValue);
+        return CollegeListDataParser::parsePageCount($paginatorNode->nodeValue);
     }
 
     private static function removeTemporaryData(&$orderByUrl)
@@ -216,32 +216,32 @@ class AllcollegesDataParser
 
     private static function parsePage($page)
     {
-        BaseYii::debug('AllcollegesDataParser parsePage ' . strval($page));
+        BaseYii::debug('CollegeListDataParser parsePage ' . strval($page));
 
-        $doc = Utils::ParseHtml(Utils::GetHtml(AllcollegesDataParser::getUrl($page)));
+        $doc = Utils::ParseHtml(Utils::GetHtml(CollegeListDataParser::getUrl($page)));
         $xpath = new \DOMXPath($doc);
 
-        $orderByUrl = AllcollegesDataParser::fillOrderByUrl($doc);
-        $allNodePaths = AllcollegesDataParser::fillAllNodePaths($orderByUrl, false);
+        $orderByUrl = CollegeListDataParser::fillOrderByUrl($doc);
+        $allNodePaths = CollegeListDataParser::fillAllNodePaths($orderByUrl, false);
 
         $nodePathsEqualItemCount = Utils::EqualItemCountMulti($allNodePaths);
         $nodePathsCommonRoot = array_slice($allNodePaths[0], 0, $nodePathsEqualItemCount);
-        AllcollegesDataParser::stripNodePaths($orderByUrl, false, $nodePathsEqualItemCount);
+        CollegeListDataParser::stripNodePaths($orderByUrl, false, $nodePathsEqualItemCount);
 
-        $pageCount = ($page == 1) ? AllcollegesDataParser::findPageCount($nodePathsCommonRoot, $xpath) : false;
+        $pageCount = ($page == 1) ? CollegeListDataParser::findPageCount($nodePathsCommonRoot, $xpath) : false;
 
-        $rootNodeNameToLinks = AllcollegesDataParser::fillRootNodeNameToLinks($orderByUrl);
-        AllcollegesDataParser::fillFeaturedFromTop($orderByUrl, $rootNodeNameToLinks);
+        $rootNodeNameToLinks = CollegeListDataParser::fillRootNodeNameToLinks($orderByUrl);
+        CollegeListDataParser::fillFeaturedFromTop($orderByUrl, $rootNodeNameToLinks);
 
-        $allFeaturedNodePaths = AllcollegesDataParser::fillAllNodePaths($orderByUrl, true);
+        $allFeaturedNodePaths = CollegeListDataParser::fillAllNodePaths($orderByUrl, true);
         $featuredNodePathsEqualItemCount = Utils::EqualItemCountMulti($allFeaturedNodePaths);
         $featuredNodePathsCommonRoot = array_slice($allFeaturedNodePaths[0], 0, $featuredNodePathsEqualItemCount);
-        AllcollegesDataParser::stripNodePaths($orderByUrl, true, $featuredNodePathsEqualItemCount);
+        CollegeListDataParser::stripNodePaths($orderByUrl, true, $featuredNodePathsEqualItemCount);
 
-        AllcollegesDataParser::fillHeaderNodeIndices($orderByUrl);
-        AllcollegesDataParser::fillUniversityInfo($orderByUrl, $xpath, $nodePathsCommonRoot, $featuredNodePathsCommonRoot);
+        CollegeListDataParser::fillHeaderNodeIndices($orderByUrl);
+        CollegeListDataParser::fillUniversityInfo($orderByUrl, $xpath, $nodePathsCommonRoot, $featuredNodePathsCommonRoot);
 
-        AllcollegesDataParser::removeTemporaryData($orderByUrl);
+        CollegeListDataParser::removeTemporaryData($orderByUrl);
 
         return [
             'orderByUrl' => $orderByUrl,
@@ -251,7 +251,7 @@ class AllcollegesDataParser
 
     public static function parse()
     {
-        $parsePage1Result = AllcollegesDataParser::parsePage(1);
+        $parsePage1Result = CollegeListDataParser::parsePage(1);
         $result = $parsePage1Result['orderByUrl'];
         $pageCount = $parsePage1Result['pageCount'];
 
@@ -261,7 +261,7 @@ class AllcollegesDataParser
         for ($pageNumber = 2; $pageNumber <= $pageCount; $pageNumber++)
         {
             sleep(1);  // reduce server request rate
-            $result = array_merge($result, AllcollegesDataParser::parsePage($pageNumber)['orderByUrl']);
+            $result = array_merge($result, CollegeListDataParser::parsePage($pageNumber)['orderByUrl']);
         }
 
         return $result;
