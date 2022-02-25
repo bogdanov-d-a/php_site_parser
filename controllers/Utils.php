@@ -10,7 +10,13 @@ class Utils
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, 0);
-        return curl_exec($handle);
+
+        $data = curl_exec($handle);
+        if ($data === false)
+        {
+            throw new \Exception('GetHtml $data === false');
+        }
+        return $data;
     }
 
     public static function ParseHtml($html)
