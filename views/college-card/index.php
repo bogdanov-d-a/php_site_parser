@@ -1,5 +1,6 @@
 <?php
 
+use app\models\CollegeCard;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
