@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use yii\web\Controller;
-use app\controllers\CollegeListDataParser;
+use app\parsers\CollegeListDataParser;
 use app\models\CollegeList;
 
 class ParseCollegeListController extends Controller

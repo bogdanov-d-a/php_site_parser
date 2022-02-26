@@ -1,8 +1,8 @@
 <?php
 
-namespace app\controllers;
+namespace app\parsers;
 
-use app\controllers\Utils;
+use app\utils\Utils;
 
 class CollegeCardDataParser
 {

@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use yii\web\Controller;
-use app\controllers\CollegeCardDataParser;
+use app\parsers\CollegeCardDataParser;
 use app\models\CollegeCard;
 use yii\BaseYii;
 
