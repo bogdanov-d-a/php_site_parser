@@ -16,6 +16,7 @@ class CollegeListProcessor
         foreach ($parseResult as $parseResultKey => $parseResultValue)
         {
             $ac = new CollegeList();
+            $ac->cardurl = $parseResultKey;
             $ac->imgurl = $parseResultValue['universityImgUrl'];
             $ac->name = $parseResultValue['universityName'];
             $ac->city = $parseResultValue['universityCity'];
