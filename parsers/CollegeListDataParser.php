@@ -3,7 +3,6 @@
 namespace app\parsers;
 
 use app\utils\Utils;
-use yii\BaseYii;
 
 class CollegeListDataParser
 {
@@ -214,9 +213,9 @@ class CollegeListDataParser
         }
     }
 
-    private static function parsePage($page)
+    private static function parsePage($page, $traceCallback)
     {
-        BaseYii::debug('CollegeListDataParser parsePage ' . strval($page));
+        call_user_func($traceCallback, 'CollegeListDataParser parsePage ' . strval($page));
 
         $doc = Utils::ParseHtml(Utils::GetHtml(CollegeListDataParser::getUrl($page)));
         $xpath = new \DOMXPath($doc);
@@ -249,9 +248,9 @@ class CollegeListDataParser
         ];
     }
 
-    public static function parse()
+    public static function parse($traceCallback)
     {
-        $parsePage1Result = CollegeListDataParser::parsePage(1);
+        $parsePage1Result = CollegeListDataParser::parsePage(1, $traceCallback);
         $result = $parsePage1Result['orderByUrl'];
         $pageCount = $parsePage1Result['pageCount'];
 
@@ -261,7 +260,7 @@ class CollegeListDataParser
         for ($pageNumber = 2; $pageNumber <= $pageCount; $pageNumber++)
         {
             sleep(1);  // reduce server request rate
-            $result = array_merge($result, CollegeListDataParser::parsePage($pageNumber)['orderByUrl']);
+            $result = array_merge($result, CollegeListDataParser::parsePage($pageNumber, $traceCallback)['orderByUrl']);
         }
 
         return $result;
