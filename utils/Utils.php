@@ -4,7 +4,7 @@ namespace app\utils;
 
 class Utils
 {
-    public static function GetHtml($url)
+    public static function GetHtml(string $url): string
     {
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
@@ -19,7 +19,7 @@ class Utils
         return $data;
     }
 
-    public static function ParseHtml($html)
+    public static function ParseHtml(string $html): \DOMDocument
     {
         libxml_use_internal_errors(true); // Prevent HTML errors from displaying
         $doc = new \DOMDocument();
@@ -27,12 +27,12 @@ class Utils
         return $doc;
     }
 
-    public static function RemoveUrlQuery($url)
+    public static function RemoveUrlQuery(string $url): string
     {
         return preg_replace('/\?.*/', '', $url);
     }
 
-    public static function EqualItemCount($array1, $array2)
+    public static function EqualItemCount(array $array1, array $array2): int
     {
         $maxResult = min(count($array1), count($array2));
 
@@ -47,7 +47,7 @@ class Utils
         return $maxResult;
     }
 
-    public static function EqualItemCountMulti($arrays)
+    public static function EqualItemCountMulti(array $arrays): int
     {
         $arraysCount = count($arrays);
         if ($arraysCount < 2)
@@ -65,12 +65,12 @@ class Utils
         return $result;
     }
 
-    public static function BoolToStr($bool)
+    public static function BoolToStr(bool $bool): string
     {
         return $bool ? 'true' : 'false';
     }
 
-    public static function ParseNthNode($str)
+    public static function ParseNthNode(string $str): array
     {
         if (preg_match('/^(\w+)\[(\w+)\]$/', $str, $matches) == false)
         {
@@ -82,12 +82,12 @@ class Utils
         ];
     }
 
-    public static function BuildNthNode($name, $index)
+    public static function BuildNthNode(string $name, int $index): string
     {
         return $name . '[' . strval($index) . ']';
     }
 
-    public static function FindOneNodeByPath($xpath, $nodePath)
+    public static function FindOneNodeByPath(\DOMXPath $xpath, array $nodePath): \DOMElement|false
     {
         $entries = $xpath->query('/' . implode('/', $nodePath));
         if (count($entries) != 1)
@@ -97,7 +97,7 @@ class Utils
         return $entries[0];
     }
 
-    public static function CleanupString($str)
+    public static function CleanupString(string $str): string
     {
         return preg_replace('/[\r\n\t\f\v]+/', '', $str);
     }

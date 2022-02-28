@@ -8,9 +8,9 @@ use app\processors\CollegeCardProcessor;
 
 class CollegeCardController extends Controller
 {
-    public function actionIndex()
+    public function actionIndex(): int
     {
-        CollegeCardProcessor::process(function($msg) {
+        CollegeCardProcessor::process(function(string $msg): void {
             echo $msg . "\n";
         });
         return ExitCode::OK;

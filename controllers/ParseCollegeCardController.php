@@ -8,9 +8,9 @@ use yii\BaseYii;
 
 class ParseCollegeCardController extends Controller
 {
-    public function actionIndex()
+    public function actionIndex(): string
     {
-        CollegeCardProcessor::process(function($msg) {
+        CollegeCardProcessor::process(function(string $msg): void {
             BaseYii::debug($msg);
         });
         return $this->render('index');

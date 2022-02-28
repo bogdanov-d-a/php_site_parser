@@ -7,7 +7,7 @@ use app\models\CollegeList;
 
 class CollegeListProcessor
 {
-    public static function process($traceCallback)
+    public static function process(callable $traceCallback): void
     {
         $parseResult = CollegeListDataParser::parse($traceCallback);
 

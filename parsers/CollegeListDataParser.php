@@ -6,7 +6,7 @@ use app\utils\Utils;
 
 class CollegeListDataParser
 {
-    private static function getUrl($page)
+    private static function getUrl(int $page): string
     {
         $url = 'https://www.princetonreview.com/college-search?ceid=cp-1022984';
         if ($page != 1)
@@ -16,7 +16,7 @@ class CollegeListDataParser
         return $url;
     }
 
-    private static function fillOrderByUrl($doc)
+    private static function fillOrderByUrl(\DOMDocument $doc): array
     {
         $result = [];
         foreach ($doc->getElementsByTagName('a') as $link)
@@ -37,7 +37,7 @@ class CollegeListDataParser
         return $result;
     }
 
-    private static function fillAllNodePaths($orderByUrl, $featuredOnly)
+    private static function fillAllNodePaths(array $orderByUrl, bool $featuredOnly): array
     {
         $result = [];
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
@@ -53,7 +53,7 @@ class CollegeListDataParser
         return $result;
     }
 
-    private static function stripNodePaths(&$orderByUrl, $featuredOnly, $nodePathsEqualItemCount)
+    private static function stripNodePaths(array &$orderByUrl, bool $featuredOnly, int $nodePathsEqualItemCount): void
     {
         foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
         {
@@ -67,7 +67,7 @@ class CollegeListDataParser
         }
     }
 
-    private static function fillRootNodeNameToLinks($orderByUrl)
+    private static function fillRootNodeNameToLinks(array $orderByUrl): array
     {
         $result = [];
         foreach ($orderByUrl as $orderByUrlKey => $orderByUrlValue)
@@ -85,7 +85,7 @@ class CollegeListDataParser
         return $result;
     }
 
-    private static function fillFeaturedFromTop(&$orderByUrl, $rootNodeNameToLinks)
+    private static function fillFeaturedFromTop(array &$orderByUrl, array $rootNodeNameToLinks): void
     {
         foreach ($rootNodeNameToLinks as $rootNodeName => $links)
         {
@@ -97,7 +97,7 @@ class CollegeListDataParser
         }
     }
 
-    private static function fillHeaderNodeIndices(&$orderByUrl)
+    private static function fillHeaderNodeIndices(array &$orderByUrl): void
     {
         foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
         {
@@ -125,7 +125,7 @@ class CollegeListDataParser
         }
     }
 
-    private static function parseUniversityLocation($location)
+    private static function parseUniversityLocation(string $location): array
     {
         $locationParts = explode(', ', $location);
         if (count($locationParts) != 2)
@@ -135,7 +135,7 @@ class CollegeListDataParser
         return $locationParts;
     }
 
-    private static function fillUniversityInfo(&$orderByUrl, $xpath, $nodePathsCommonRoot, $featuredNodePathsCommonRoot)
+    private static function fillUniversityInfo(array &$orderByUrl, \DOMXPath $xpath, array $nodePathsCommonRoot, array $featuredNodePathsCommonRoot): void
     {
         foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
         {
@@ -183,7 +183,7 @@ class CollegeListDataParser
         }
     }
 
-    private static function parsePageCount($str)
+    private static function parsePageCount(string $str): int
     {
         if (preg_match('/^Page \d+ of (\d+)$/', $str, $matches) == false)
         {
@@ -192,7 +192,7 @@ class CollegeListDataParser
         return intval($matches[1]);
     }
 
-    private static function findPageCount($nodePathsCommonRoot, $xpath)
+    private static function findPageCount(array $nodePathsCommonRoot, \DOMXPath $xpath): int
     {
         $paginatorNodePath = array_merge($nodePathsCommonRoot, ['div[last()]', 'div']);
         $paginatorNode = Utils::FindOneNodeByPath($xpath, $paginatorNodePath);
@@ -203,7 +203,7 @@ class CollegeListDataParser
         return CollegeListDataParser::parsePageCount($paginatorNode->nodeValue);
     }
 
-    private static function removeTemporaryData(&$orderByUrl)
+    private static function removeTemporaryData(array &$orderByUrl): void
     {
         foreach ($orderByUrl as $orderByUrlKey => &$orderByUrlValue)
         {
@@ -213,7 +213,7 @@ class CollegeListDataParser
         }
     }
 
-    private static function parsePage($page, $traceCallback)
+    private static function parsePage(int $page, callable $traceCallback): array
     {
         call_user_func($traceCallback, 'CollegeListDataParser parsePage ' . strval($page));
 
@@ -248,7 +248,7 @@ class CollegeListDataParser
         ];
     }
 
-    public static function parse($traceCallback)
+    public static function parse(callable $traceCallback): array
     {
         $parsePage1Result = CollegeListDataParser::parsePage(1, $traceCallback);
         $result = $parsePage1Result['orderByUrl'];

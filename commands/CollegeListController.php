@@ -8,9 +8,9 @@ use app\processors\CollegeListProcessor;
 
 class CollegeListController extends Controller
 {
-    public function actionIndex()
+    public function actionIndex(): int
     {
-        CollegeListProcessor::process(function($msg) {
+        CollegeListProcessor::process(function(string $msg): void {
             echo $msg . "\n";
         });
         return ExitCode::OK;

@@ -7,7 +7,7 @@ use app\models\CollegeCard;
 
 class CollegeCardProcessor
 {
-    public static function process($traceCallback)
+    public static function process(callable $traceCallback): void
     {
         foreach (CollegeCard::find()->where('`needupd`')->all() as $collegeCard)
         {

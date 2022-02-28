@@ -6,7 +6,7 @@ use app\utils\Utils;
 
 class CollegeCardDataParser
 {
-    private static function findCampusVisitsContactNode($doc)
+    private static function findCampusVisitsContactNode(\DOMDocument $doc): \DOMElement|false
     {
         foreach ($doc->getElementsByTagName('h2') as $elem)
         {
@@ -18,7 +18,7 @@ class CollegeCardDataParser
         return false;
     }
 
-    private static function findWebsiteLinkTextNode($doc)
+    private static function findWebsiteLinkTextNode(\DOMDocument $doc): \DOMElement
     {
         foreach ($doc->getElementsByTagName('strong') as $elem)
         {
@@ -30,13 +30,13 @@ class CollegeCardDataParser
         throw new \Exception('findWebsiteLinkTextNode not found');
     }
 
-    private static function getNextNode($str)
+    private static function getNextNode(string $str): string
     {
         $parseResult = Utils::ParseNthNode($str);
         return Utils::BuildNthNode($parseResult['name'], $parseResult['index'] + 1);
     }
 
-    private static function parseAddress($node)
+    private static function parseAddress(\DOMElement $node): string
     {
         $result = '';
         foreach ($node->childNodes as $elem)
@@ -49,7 +49,7 @@ class CollegeCardDataParser
         return $result;
     }
 
-    private static function parseCampusVisitsContactNodeRow($node)
+    private static function parseCampusVisitsContactNodeRow(\DOMElement $node): array
     {
         $result = [];
         foreach ($node->childNodes as $elem)
@@ -67,7 +67,7 @@ class CollegeCardDataParser
         return $result;
     }
 
-    private static function parseCampusVisitsContactNode($node, &$result)
+    private static function parseCampusVisitsContactNode(\DOMElement $node, array &$result): void
     {
         foreach ($node->childNodes as $rowNode)
         {
@@ -86,7 +86,7 @@ class CollegeCardDataParser
         }
     }
 
-    public static function parse($url)
+    public static function parse(string $url): array
     {
         $doc = Utils::ParseHtml(Utils::GetHtml($url));
         $xpath = new \DOMXPath($doc);
