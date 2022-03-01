@@ -227,7 +227,7 @@ class CollegeListDataParser
         $nodePathsCommonRoot = array_slice($allNodePaths[0], 0, $nodePathsEqualItemCount);
         CollegeListDataParser::stripNodePaths($orderByUrl, false, $nodePathsEqualItemCount);
 
-        $pageCount = ($page == 1) ? CollegeListDataParser::findPageCount($nodePathsCommonRoot, $xpath) : false;
+        $pageCount = ($page == 1) ? CollegeListDataParser::findPageCount($nodePathsCommonRoot, $xpath) : 0;
 
         $rootNodeNameToLinks = CollegeListDataParser::fillRootNodeNameToLinks($orderByUrl);
         CollegeListDataParser::fillFeaturedFromTop($orderByUrl, $rootNodeNameToLinks);
