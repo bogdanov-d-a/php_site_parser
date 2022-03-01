@@ -32,8 +32,8 @@ class CollegeCardDataParser
 
     private static function getNextNode(string $str): string
     {
-        $parseResult = Utils::ParseNthNode($str);
-        return Utils::BuildNthNode($parseResult['name'], $parseResult['index'] + 1);
+        $parseResult = Utils::parseNthNode($str);
+        return Utils::buildNthNode($parseResult['name'], $parseResult['index'] + 1);
     }
 
     private static function parseAddress(\DOMElement $node): string
@@ -43,7 +43,7 @@ class CollegeCardDataParser
         {
             if ($elem->nodeType == XML_TEXT_NODE)
             {
-                $result .= Utils::CleanupString($elem->nodeValue) . "\n";
+                $result .= Utils::cleanupString($elem->nodeValue) . "\n";
             }
         }
         return $result;
@@ -63,7 +63,7 @@ class CollegeCardDataParser
         {
             throw new \Exception('parseCampusVisitsContactNodeRow count($result) != 2');
         }
-        $result[0] = Utils::CleanupString($result[0]->nodeValue);
+        $result[0] = Utils::cleanupString($result[0]->nodeValue);
         return $result;
     }
 
@@ -80,7 +80,7 @@ class CollegeCardDataParser
                 }
                 elseif ($parseResult[0] == 'Phone')
                 {
-                    $result['phone'] = Utils::CleanupString($parseResult[1]->nodeValue);
+                    $result['phone'] = Utils::cleanupString($parseResult[1]->nodeValue);
                 }
             }
         }
@@ -88,7 +88,7 @@ class CollegeCardDataParser
 
     public static function parse(string $url): array
     {
-        $doc = Utils::ParseHtml(Utils::GetHtml($url));
+        $doc = Utils::parseHtml(Utils::getHtml($url));
         $xpath = new \DOMXPath($doc);
         $result = [];
 
@@ -103,7 +103,7 @@ class CollegeCardDataParser
             $popNode = array_pop($campusVisitsContactNodePath);
             $campusVisitsContactNodePath = array_merge($campusVisitsContactNodePath, [CollegeCardDataParser::getNextNode($popNode)]);
 
-            $campusVisitsContactNode = Utils::FindOneNodeByPath($xpath, $campusVisitsContactNodePath);
+            $campusVisitsContactNode = Utils::findOneNodeByPath($xpath, $campusVisitsContactNodePath);
             if ($campusVisitsContactNode === false)
             {
                 throw new \Exception('parse $campusVisitsContactNode === false');
@@ -113,7 +113,7 @@ class CollegeCardDataParser
 
         $websiteLinkTextNodePath = explode('/', CollegeCardDataParser::findWebsiteLinkTextNode($doc)->getNodePath());
         array_pop($websiteLinkTextNodePath);
-        $websiteLinkTextNode = Utils::FindOneNodeByPath($xpath, $websiteLinkTextNodePath);
+        $websiteLinkTextNode = Utils::findOneNodeByPath($xpath, $websiteLinkTextNodePath);
         if ($websiteLinkTextNode === false)
         {
             throw new \Exception('parse $websiteLinkTextNode === false');
@@ -121,7 +121,7 @@ class CollegeCardDataParser
         $result['siteurl'] = $websiteLinkTextNode->getAttribute('href');
 
         $nameNodePath = array_merge(array_slice($websiteLinkTextNodePath, 0, -3), ['h1', 'span']);
-        $nameNode = Utils::FindOneNodeByPath($xpath, $nameNodePath);
+        $nameNode = Utils::findOneNodeByPath($xpath, $nameNodePath);
         if ($nameNode === false)
         {
             throw new \Exception('parse $nameNode === false');

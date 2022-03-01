@@ -15,13 +15,13 @@ class CollegeListProcessor
 
         foreach ($parseResult as $parseResultKey => $parseResultValue)
         {
-            $ac = new CollegeList();
-            $ac->cardurl = $parseResultKey;
-            $ac->imgurl = $parseResultValue['universityImgUrl'];
-            $ac->name = $parseResultValue['universityName'];
-            $ac->city = $parseResultValue['universityCity'];
-            $ac->state = $parseResultValue['universityState'];
-            $ac->save();
+            $collegeList = new CollegeList();
+            $collegeList->cardurl = $parseResultKey;
+            $collegeList->imgurl = $parseResultValue['universityImgUrl'];
+            $collegeList->name = $parseResultValue['universityName'];
+            $collegeList->city = $parseResultValue['universityCity'];
+            $collegeList->state = $parseResultValue['universityState'];
+            $collegeList->save();
         }
     }
 }

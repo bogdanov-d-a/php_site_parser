@@ -21,7 +21,7 @@ class CollegeListDataParser
         $result = [];
         foreach ($doc->getElementsByTagName('a') as $link)
         {
-            $url = Utils::RemoveUrlQuery($link->getAttribute('href'));
+            $url = Utils::removeUrlQuery($link->getAttribute('href'));
             if (str_starts_with($url, '/college/'))
             {
                 if (!array_key_exists($url, $result))
@@ -147,7 +147,7 @@ class CollegeListDataParser
 
             $headerNodePathRelative = $orderByUrlValue['nodes'][$orderByUrlValue['headerNodeIndex']]['nodePath'];
             $headerNodePath = array_merge($nodePathRoot, $headerNodePathRelative);
-            $headerNode = Utils::FindOneNodeByPath($xpath, $headerNodePath);
+            $headerNode = Utils::findOneNodeByPath($xpath, $headerNodePath);
             if ($headerNode === false)
             {
                 throw new \Exception('fillUniversityInfo $headerNode === false');
@@ -158,7 +158,7 @@ class CollegeListDataParser
             $orderByUrlValue['universityState'] = '';
 
             $locationNodePath = array_merge(array_slice($headerNodePath, 0, array_search('h2', $headerNodePath)), ['div[1]']);
-            $locationNode = Utils::FindOneNodeByPath($xpath, $locationNodePath);
+            $locationNode = Utils::findOneNodeByPath($xpath, $locationNodePath);
 
             if ($locationNode !== false && $locationNode->getAttribute('class') == 'location')
             {
@@ -168,7 +168,7 @@ class CollegeListDataParser
             }
 
             $universityNodePathRoot = array_merge($nodePathRoot, [$headerNodePathRelative[0]]);
-            $universityNodeRoot = Utils::FindOneNodeByPath($xpath, $universityNodePathRoot);
+            $universityNodeRoot = Utils::findOneNodeByPath($xpath, $universityNodePathRoot);
             if ($universityNodeRoot === false)
             {
                 throw new \Exception('fillUniversityInfo $universityNodeRoot === false');
@@ -195,7 +195,7 @@ class CollegeListDataParser
     private static function findPageCount(array $nodePathsCommonRoot, \DOMXPath $xpath): int
     {
         $paginatorNodePath = array_merge($nodePathsCommonRoot, ['div[last()]', 'div']);
-        $paginatorNode = Utils::FindOneNodeByPath($xpath, $paginatorNodePath);
+        $paginatorNode = Utils::findOneNodeByPath($xpath, $paginatorNodePath);
         if ($paginatorNode === false)
         {
             throw new \Exception('findPageCount $paginatorNode === false');
@@ -217,13 +217,13 @@ class CollegeListDataParser
     {
         call_user_func($traceCallback, 'CollegeListDataParser parsePage ' . strval($page));
 
-        $doc = Utils::ParseHtml(Utils::GetHtml(CollegeListDataParser::getUrl($page)));
+        $doc = Utils::parseHtml(Utils::getHtml(CollegeListDataParser::getUrl($page)));
         $xpath = new \DOMXPath($doc);
 
         $orderByUrl = CollegeListDataParser::fillOrderByUrl($doc);
         $allNodePaths = CollegeListDataParser::fillAllNodePaths($orderByUrl, false);
 
-        $nodePathsEqualItemCount = Utils::EqualItemCountMulti($allNodePaths);
+        $nodePathsEqualItemCount = Utils::equalItemCountMulti($allNodePaths);
         $nodePathsCommonRoot = array_slice($allNodePaths[0], 0, $nodePathsEqualItemCount);
         CollegeListDataParser::stripNodePaths($orderByUrl, false, $nodePathsEqualItemCount);
 
@@ -233,7 +233,7 @@ class CollegeListDataParser
         CollegeListDataParser::fillFeaturedFromTop($orderByUrl, $rootNodeNameToLinks);
 
         $allFeaturedNodePaths = CollegeListDataParser::fillAllNodePaths($orderByUrl, true);
-        $featuredNodePathsEqualItemCount = Utils::EqualItemCountMulti($allFeaturedNodePaths);
+        $featuredNodePathsEqualItemCount = Utils::equalItemCountMulti($allFeaturedNodePaths);
         $featuredNodePathsCommonRoot = array_slice($allFeaturedNodePaths[0], 0, $featuredNodePathsEqualItemCount);
         CollegeListDataParser::stripNodePaths($orderByUrl, true, $featuredNodePathsEqualItemCount);
 
